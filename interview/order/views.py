@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 
 from interview.order.models import Order, OrderTag
-from interview.order.serializers import OrderSerializer, OrderTagSerializer
+from interview.order.serializers import OrderSerializer, OrderTagSerializer, OrderTagOnlySerializer
 
 from datetime import datetime
 
@@ -50,4 +50,17 @@ class OrderFilterDateView(generics.ListCreateAPIView):
     
     def get_queryset(self,**kwargs):
         return self.queryset.filter(**kwargs)
+    
+class OrderTagCreateView(generics.ListAPIView):
+    queryset = Order.objects.all().only('id','tags')
+    serializer_class = OrderTagOnlySerializer
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        order = self.get_queryset(id=kwargs['id'])
+        serializer = self.serializer_class(order)
+
+        return Response(serializer.data, status=200)
+
+    def get_queryset(self, **kwargs):
+        return self.queryset.get(**kwargs)
     

@@ -7,7 +7,7 @@ from interview.inventory.models import Inventory, InventoryLanguage, InventoryTa
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
 from interview.inventory.pagination import CustomPagination
-
+import datetime as dt
 
 
 class InventoryListCreateView(APIView):
@@ -46,6 +46,25 @@ class InventoryListCreateView(APIView):
     
     def get_queryset(self):
         return self.queryset.all()
+
+class InventoryPostDayListCreateView(APIView):
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+    
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            start_date_1 = dt.datetime(2023,4,3,16,26,44,234672)#.strptime(kwargs['embargo_date'],'%Y-%m-%d').date()
+            inventory = self.get_queryset(created_at__gte=start_date_1)
+            print(inventory.values())
+            serializer = self.serializer_class(inventory, many= True)
+        
+            return Response(serializer.data, status=200)
+        
+        except Exception as e:
+            print("******** Exception: ",e)
+    
+    def get_queryset(self, **kwargs):
+        return self.queryset.filter(**kwargs)
     
 
 class InventoryRetrieveUpdateDestroyView(APIView):

@@ -33,8 +33,3 @@ class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         fields = ['id', 'name', 'type', 'language', 'tags', 'metadata']
-
-class PaginatedInventorySerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        object_serializer_class = InventorySerializer

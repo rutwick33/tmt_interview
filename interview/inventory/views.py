@@ -1,19 +1,15 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from rest_framework.pagination import PageNumberPagination
 
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
-from interview.inventory.pagination import CustomPagination
-
 
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
-    pagination_class = CustomPagination
     
     def post(self, request: Request, *args, **kwargs) -> Response:
         try:
@@ -31,18 +27,9 @@ class InventoryListCreateView(APIView):
         return Response(serializer.data, status=201)
     
     def get(self, request: Request, *args, **kwargs) -> Response:
-        req = request
-        try:
-            page = self.pagination_class.paginate_queryset(self.pagination_class, queryset=self.get_queryset(), request = req)
-            if page is not None:
-                serializer = self.serializer_class(page, many=True)
-                return self.pagination_class.get_paginated_response(serializer.data)
-            
-            serializer = self.serializer_class(self.get_queryset(), many=True)
-            return Response(serializer.data, status=200)
+        serializer = self.serializer_class(self.get_queryset(), many=True)
         
-        except Exception as e:
-            print("******** Exception: ",e)
+        return Response(serializer.data, status=200)
     
     def get_queryset(self):
         return self.queryset.all()

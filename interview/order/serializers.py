@@ -24,3 +24,10 @@ class OrderTagOnlySerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'tags']
+
+class OrderSpecificTagSerializer(serializers.ModelSerializer):
+    tags = OrderTagSerializer(source='filtered_tags',many=True)
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'start_date', 'embargo_date', 'tags', 'is_active']
